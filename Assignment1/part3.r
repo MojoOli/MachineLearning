@@ -1,8 +1,8 @@
-# part 1
+#task 1
 
-# part 2
+#task 2
 
 
-# part 3
+#task 3
 
-# ...
+#...
