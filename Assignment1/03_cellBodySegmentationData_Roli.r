@@ -59,6 +59,8 @@ plot(segDat$SkewIntenCh4 ~ segDat$AngleCh1, main='AngleCh1 vs SkewInternCh4', xl
 # Linear correlation (positive)
 plot(segDat$AvgIntenCh1 ~ segDat$DiffIntenDensityCh1, main='DiffIntenDensityCh1 vs AvgIntenCh1', xlab='DiffIntenDensityCh1', ylab='AvgIntenCh1')
 plot(segDat$SkewIntenCh4 ~ segDat$IntenCoocMaxCh4, main='IntenCoocMaxCh4 vs SkewIntenCh4', xlab='IntenCoocMaxCh4', ylab='SkewIntenCh4')
+plot(segDat$SkewIntenCh4 ~ segDat$AvgIntenCh4, main='IntenCoocMaxCh4 vs SkewIntenCh4', xlab='IntenCoocMaxCh4', ylab='SkewIntenCh4')
+
 
 # Non-linear correlation (negative)
 plot(segDat$AvgIntenCh1 ~ segDat$ConvexHullAreaRatioCh1, main='ConvexHullAreaRatioCh1 vs AvgIntenCh1', xlab='ConvexHullAreaRatioCh1', ylab='AvgIntenCh1')
@@ -74,7 +76,6 @@ plot(segDat$AvgIntenCh2 ~ segDat$AngleCh1, main='AngleCh1 vs AvgIntenCh2', xlab=
 plot(segDat$AreaCh1 ~ segDat$ConvexHullAreaRatioCh1, main='ConvexHullAreaRatioCh1 vs AreaCh1', xlab='ConvexHullAreaRatioCh1', ylab='AreaCh1')
 plot(segDat$AvgIntenCh3 ~ segDat$ConvexHullAreaRatioCh1, main='ConvexHullAreaRatioCh1 vs AvgIntenCh3', xlab='ConvexHullAreaRatioCh1', ylab='AvgIntenCh3')
 
-
 ### Relations between Features and Classes - Detailed
 
 # There seems to be no correlation between the classes and the features if you look at the pair plots from above
@@ -82,7 +83,7 @@ plot(segDat$AvgIntenCh3 ~ segDat$ConvexHullAreaRatioCh1, main='ConvexHullAreaRat
 featurePlot(x = segDat[,2:15], y=segDat$Class, plot='density', 
             plot.points = F, scales=list(relation='free'), 
             auto.key=list(columns=2),
-            main="Feature count by classes")
+            main="Amount of values in each feature by classes")
 
 # It seems that there are at least 5 features that show a really distinct trend for a class
 # For Class WS:
@@ -114,22 +115,31 @@ featurePlot(x = segDat[,2:15], y=segDat$Class, plot='box',
 
 # WS correlation detailed
 plot(segDat$ConvexHullPerimRatioCh1 ~ segDat$AvgIntenCh2, col=segDat$Class, main='AvgIntenCh2 vs ConvexHullPerimRatioCh1 class colorized', xlab='AvgIntenCh2', ylab='ConvexHullPerimRatioCh1')
+legend("topright", legend = levels(segDat$Class), col=unique(segDat$Class), pch='o')
 plot(segDat$ConvexHullAreaRatioCh1 ~ segDat$AvgIntenCh2, col=segDat$Class, main='AvgIntenCh2 vs ConvexHullAreaRatioCh1 class colorized', xlab='AvgIntenCh2', ylab='ConvexHullAreaRatioCh1')
+legend("topright", legend = levels(segDat$Class), col=unique(segDat$Class), pch='o')
 plot(segDat$ConvexHullAreaRatioCh1 ~ segDat$ConvexHullPerimRatioCh1, col=segDat$Class, main='ConvexHullPerimRatioCh1 vs ConvexHullAreaRatioCh1 class colorized', xlab='ConvexHullPerimRatioCh1', ylab='ConvexHullAreaRatioCh1')
+legend("topright", legend = levels(segDat$Class), col=unique(segDat$Class), pch='o')
 
 # PS correlation detailed
 plot(segDat$AvgIntenCh1 ~ segDat$IntenCoocMaxCh3, col=segDat$Class, main='IntenCoocMaxCh3 vs AvgIntenCh1 class colorized', xlab='IntenCoocMaxCh3', ylab='AvgIntenCh1')
 
 # Correlations of the selected features with class coloring detailed
 plot(segDat$ConvexHullPerimRatioCh1 ~ segDat$AvgIntenCh1, col=segDat$Class, main='AvgIntenCh1 vs ConvexHullPerimRatioCh1 class colorized', xlab='AvgIntenCh1', ylab='ConvexHullPerimRatioCh1')
+legend("topright", legend = levels(segDat$Class), col=unique(segDat$Class), pch='o')
 plot(segDat$ConvexHullAreaRatioCh1 ~ segDat$AvgIntenCh1, col=segDat$Class, main='AvgIntenCh1 vs ConvexHullAreaRatioCh1 class colorized', xlab='AvgIntenCh1', ylab='ConvexHullAreaRatioCh1')
+legend("topright", legend = levels(segDat$Class), col=unique(segDat$Class), pch='o')
 plot(segDat$AvgIntenCh2 ~ segDat$AvgIntenCh1, col=segDat$Class, main='AvgIntenCh1 vs AvgIntenCh2 class colorized', xlab='AvgIntenCh1', ylab='AvgIntenCh2')
+legend("topright", legend = levels(segDat$Class), col=unique(segDat$Class), pch='o')
 
 plot(segDat$ConvexHullPerimRatioCh1 ~ segDat$IntenCoocMaxCh3, col=segDat$Class, main='IntenCoocMaxCh3 vs ConvexHullPerimRatioCh1 class colorized', xlab='IntenCoocMaxCh3', ylab='ConvexHullPerimRatioCh1')
 plot(segDat$ConvexHullAreaRatioCh1 ~ segDat$IntenCoocMaxCh3, col=segDat$Class, main='IntenCoocMaxCh3 vs ConvexHullAreaRatioCh1 class colorized', xlab='IntenCoocMaxCh3', ylab='ConvexHullAreaRatioCh1')
 plot(segDat$AvgIntenCh2 ~ segDat$IntenCoocMaxCh3, col=segDat$Class, main='IntenCoocMaxCh3 vs AvgIntenCh2 class colorized', xlab='IntenCoocMaxCh3', ylab='AvgIntenCh2')
+legend("topright", legend = levels(segDat$Class), col=unique(segDat$Class), pch='o')
 
 # Other correlations that could be promising
 plot(segDat$AvgIntenCh2 ~ segDat$AvgIntenCh3, col=segDat$Class, main='AvgIntenCh3 vs AvgIntenCh2 class colorized', xlab='AvgIntenCh3', ylab='AvgIntenCh2')
+legend("topright", legend = levels(segDat$Class), col=unique(segDat$Class), pch='o')
 plot(segDat$AvgIntenCh3 ~ segDat$DiffIntenDensityCh1, col=segDat$Class, main='DiffIntenDensityCh1 vs AvgIntenCh3 class colorized', xlab='DiffIntenDensityCh1', ylab='AvgIntenCh3')
 plot(segDat$AreaCh1 ~ segDat$AvgIntenCh1, col=segDat$Class, main='AvgIntenCh1 vs AreaCh1 class colorized', xlab='AvgIntenCh1', ylab='AreaCh1')
+legend("topright", legend = levels(segDat$Class), col=unique(segDat$Class), pch='o')
