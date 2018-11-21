@@ -29,8 +29,6 @@ library(plyr)
 library(caret) # caret ML framework
 library(doMC) # parallelization
 registerDoMC(3) # register 3 cores (more cores require more RAM)
-
-setwd('/home/rsp/FH_Hagenberg/MCM/3.Semester/MC_520-MachineLearning/Exercises/Exercise_FaceRecognition/')
 ###
 
 ### Import data
@@ -47,18 +45,42 @@ imgData <- ldply(dir(path = 'dsr-preprocessed-1000x1333_faces_haar_gray_resized1
 # Then convert it to a factor (a class label)
 imgData[,1] <- as.factor(sprintf("P%02d", imgData[,1]))
 levels(imgData$`1`)
-str(imgData)
+summary(imgData$`1`)
 ### 
 
 ### Draw correlation plots for the first couple of features
-corrplot(cor(imgData[,2:450])) # 16 pixles
-corrplot(cor(imgData[,2:50])) # 1st pixel
-corrplot(cor(imgData[,1001:1200])) # 200 pixels from the middle
-corrplot(cor(imgData[,1201:1500])) # 300 pixel from the middle
+corrplot(cor(imgData[,2:450]))
+corrplot(cor(imgData[,2:50]))
+corrplot(cor(imgData[,1001:1200]))
+corrplot(cor(imgData[,1201:1500]))
 ###
 
-# ldply(dir(path = 'dsr-preprocessed-1000x1333_faces_haar_gray_resized150_equalized_50x50/', full.names= T, pattern = 'png'), function(f) strsplit(print(f), "_")[20])
-# testfile <- dir(path = 'dsr-preprocessed-1000x1333_faces_haar_gray_resized150_equalized_50x50/', full.names= T, pattern = 'png')[21]
-# person <- strsplit(testfile, '_')[[1]][8]
-# personTable <- t(c(as.factor(paste('P', strsplit(testfile, '_')[[1]][8], sep = "")), 1:10))
-# str(personTable)
+### Training + Setup
+models <- list()
+trControl <- trainControl(method = 'repeatedcv', 
+                          number = 10, 
+                          repeats = 20, 
+                          returnData = F, 
+                          classProbs = T, 
+                          returnResamp = 'final', 
+                          allowParallel = T)
+
+## LDA Model 
+# Preprocessing: centering, scaling and PCA 
+# Partitioning: 10CV Repeated 20 times
+names(getModelInfo('lda')) # linear discriminant analysis
+getModelInfo('lda')[[1]]$parameters # this model does not have any hyperparameters
+models$modelLda <- train(x = imgData[,2:2500], 
+                         y = imgData[,1], 
+                         preProcess = c('center', 'scale', 'pca'), 
+                         method = 'lda', 
+                         tuneGrid = NULL, 
+                         metric = 'Kappa', 
+                         trControl = trControl)
+models$modelLda
+cvConfMatrix <- confusionMatrix(models$modelLda)
+cvConfMatrix
+levelplot(sweep(x = cvConfMatrix$table, STATS = colSums(cvConfMatrix$table), MARGIN = 2, FUN = '/'), col.regions=gray(100:0/100))
+##
+
+###
