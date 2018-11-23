@@ -1,0 +1,25 @@
+Sliding Window:
+
+Width = 50 , Mean
+Accuracy  Kappa
+0.695623  0.6848554
+
+Width = 50 , Median
+Accuracy   Kappa    
+0.8717164  0.8671671
+
+Width = 50 , IQR
+Accuracy   Kappa   
+0.8664181  0.861677
+
+Width = 50 , MAD
+Accuracy   Kappa    
+0.8439835  0.8384487
+
+Width = 10, Median
+Accuracy   Kappa   
+0.9995598  0.999544
+
+Width = 5, Median
+Accuracy  Kappa
+  1         1   

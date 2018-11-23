@@ -1,0 +1,6 @@
+Accuracy   Kappa    
+0.9984375  0.9983821
+
+Threshhold 60%
+Accuracy   Kappa    
+0.9956556  0.9955012
