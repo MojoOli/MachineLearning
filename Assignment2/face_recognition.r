@@ -23,12 +23,14 @@
 ###########################################################################################
 
 ### Libraries and workspace setup
+install.packages("doMC")
 library(corrplot)
 library(png)
 library(plyr)
+library(imager)
 library(caret) # caret ML framework
 library(doMC) # parallelization
-registerDoMC(7) # register 7 cores (more cores require more RAM)
+registerDoMC(8) # register 8 cores (more cores require more RAM)
 ###
 
 ### Import data
@@ -55,7 +57,7 @@ gMagData <- alply(as.matrix(imgData[,2:2501]), .margins=1, .fun=function(x){
 # show difference in images
 normalImage <- as.cimg(matrix(data = unlist(imgData[1,2:2501]), nrow = 50, ncol = 50))
 sidePlot <- as.imlist(list(grayscale=normalImage, "gradient magnitude" =gMagData[[1]]))
-plot(sidePlot, layout="row")
+plot(sidePlot, layout="row", xlab="pixel", ylab="pixel")
 
 # threshold(gMagData[[1]],"60%") %>% plot(main="Determinant: 40% highest values")
 
@@ -66,6 +68,7 @@ gMagDataFrame <- ldply(gMagData, .fun=function(x){
   as.vector(base)
   # as.numeric(threshold(base,"60%"))
 })
+# get rid of levels
 gMagDataFrame<-Filter(is.numeric, gMagDataFrame)
 
 #######
@@ -106,6 +109,7 @@ trControl <- trainControl(method = 'repeatedcv',
 # Partitioning: 10CV Repeated 20 times
 names(getModelInfo('lda')) # linear discriminant analysis
 getModelInfo('lda')[[1]]$parameters # this model does not have any hyperparameters
+?train
 models$modelLda <- train(x = gMagDataFrame,
                          y = imgData[,1],
                          preProcess = c('center', 'scale', 'pca'), 
