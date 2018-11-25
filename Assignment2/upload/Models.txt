@@ -1,0 +1,3 @@
+Due to the size of the models we provide a GitHub repo link:
+
+https://github.com/MojoOli/MachineLearning/tree/master/Assignment2/models
