@@ -23,11 +23,7 @@
 ###########################################################################################
 
 ### Libraries and workspace setup
-<<<<<<< HEAD
 library(imager)
-=======
-install.packages("doMC")
->>>>>>> origin/master
 library(corrplot)
 library(png)
 library(plyr)
@@ -39,7 +35,7 @@ registerDoMC(8) # register 8 cores (more cores require more RAM)
 
 ### Import data
 # Import data from the images and add the person number as the first column
-imgData <- ldply(dir(path = 'dsr-preprocessed-1000x1333_faces_haar_gray_resized150_equalized_50x50/', 
+imgData <- ldply(dir(path = 'dataset', 
                      full.names= T, pattern = 'png'), 
                  function(f) {
                    t(

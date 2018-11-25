@@ -23,8 +23,6 @@
 ###########################################################################################
 
 ### Libraries and workspace setup
-install.packages("doMC")
-install.packages("imager")
 library(corrplot)
 library(png)
 library(plyr)
