@@ -23,7 +23,9 @@
 ###########################################################################################
 
 ### Libraries and workspace setup
+install.packages("Cairo")
 install.packages("doMC")
+install.packages("imager")
 library(corrplot)
 library(png)
 library(plyr)
@@ -35,7 +37,7 @@ registerDoMC(4) # register 3 cores (more cores require more RAM)
 
 ### Import data
 # Import data from the images and add the person number as the first column
-imgData <- ldply(dir(path = 'dsr-preprocessed-1000x1333_faces_haar_gray_resized150_equalized_50x50/', 
+imgData <- ldply(dir(path = 'dataset', 
                      full.names= T, pattern = 'png'), 
                  function(f) {
                    t(
@@ -43,7 +45,7 @@ imgData <- ldply(dir(path = 'dsr-preprocessed-1000x1333_faces_haar_gray_resized1
                        as.numeric(strsplit(f, '_')[[1]][8]),
                        as.numeric(readPNG(f))))
                    });
-
+normalImage <- as.cimg(matrix(data = unlist(imgData[1,2:2501]), nrow = 50, ncol = 50))
 ####### Edge Detection
 
 # convert data to matrix to be able to use plyr without variable grouping 
@@ -55,7 +57,7 @@ gMagData <- alply(as.matrix(imgData[,2:2501]), .margins=1, .fun=function(x){
 })
 
 # show difference in images
-normalImage <- as.cimg(matrix(data = unlist(imgData[1,2:2501]), nrow = 50, ncol = 50))
+
 sidePlot <- as.imlist(list(grayscale=normalImage, "gradient magnitude" =gMagData[[1]]))
 plot(sidePlot, layout="row", xlab="pixel", ylab="pixel")
 
@@ -75,9 +77,25 @@ gMagDataFrame<-Filter(is.numeric, gMagDataFrame)
 
 ### Sliding window approach
 library(zoo)
-swImgDataTransposed <- rollapply(data = t(imgData[,2:2501]), width = 5, by=5, FUN = median)
-swImgData = as.data.frame(t(swImgDataTransposed))
-dim(swImgData)
+
+windowSize<-2
+swImgData <- alply(as.matrix(imgData[,2:2501]), .margins=1, .fun=function(x){
+  imgData <- matrix(data = x, nrow = 50, ncol = 50)
+  imgData <- rollapply(data = imgData, width = windowSize, by = windowSize, FUN = median)
+  imgData <- as.cimg(t(rollapply(data = t(imgData), width = windowSize, by = windowSize, FUN = median)))
+})
+
+# show difference in images
+sidePlot <- as.imlist(list(grayscale=normalImage, "sliding window image" = swImgData[[1]]))
+plot(sidePlot, layout="row", xlab="pixel", ylab="pixel")
+
+# convert to data frame
+swImgDataFrame <- ldply(swImgData, .fun=function(x){
+  base<-x[,,1,1]
+  as.vector(base)
+})
+# get rid of levels
+swImgDataFrame<-Filter(is.numeric, swImgDataFrame)
 ###
 
 # Convert the person number into a "normalized" string by adding P and ensuring it is always (at least) 3 characters long
