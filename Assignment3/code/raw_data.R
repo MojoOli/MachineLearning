@@ -1,4 +1,5 @@
 library(magrittr) #needed for pipes
+library(plyr) #for vectorized commands
 library(dplyr) #needed for filter
 
 #load data
@@ -41,13 +42,12 @@ data_z<-data.matrix(subset_z[,4:len_x])
 #utility function for plotting 
 plot_axis=function(dataset){
   color<-rgb(0,0,0,alpha=0.3)
-  plot(dataset[1,],type = 'l',col=color,ylim=range(min(dataset),max(dataset)),xlab = "sample",ylab = "acceleration")
+  plot(dataset[1,],type = 'l',col=color,ylim=range(min(dataset),max(dataset)),xlab = "length",ylab = "acceleration")
   
   for (i in seq(2:dim(dataset)[1])){
     lines(data_x[i,],col=color)
   }
 }
-
 
 plot_axis(data_x)
 plot_axis(data_y)
