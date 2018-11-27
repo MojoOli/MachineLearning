@@ -1,30 +1,62 @@
 ### Sample Length ###
 
-# get feature length and store it into datafram
-feature_length <- adply(.data = data_x, .margins = 1, .fun = function(x){
-  length(which(!is.na(x)))
-})
-
-# get rid of levels
-feature_length<-Filter(is.numeric, feature_length)
-
-str(feature_length)
+getFeatureLength <- function (data){
+  # get feature length and store it into datafram
+  feature_length <- adply(.data = data, .margins = 1, .fun = function(x){
+    length(which(!is.na(x)))
+  })
+  
+  # get rid of levels
+  feature_length<-Filter(is.numeric, feature_length)
+}
 
 ### Sample Length ###
 
-### Frequency power and phase ###
+### Frequency power###
 
-feature_mag <- adply(.data = data_x, .margins = 1, .fun = function(x){
-  Mod(fft(x))
-})
+getFeatureMagnitude <- function (data){
+  data[is.na(data)] <- 0
+  
+  feature_mag <- adply(.data = data, .margins = 1, .fun = function(x){
+    Mod(fft(x))
+  })
+  
+  # get rid of levels
+  feature_mag<-Filter(is.numeric, feature_mag)
+}
 
-# get rid of levels
-feature_mag<-Filter(is.numeric, feature_mag)
-str(feature_mag)
+### Frequency power ###
 
-?matplot
-matplot(t(feature_mag), type='h', col=factor(data_x[1,]))
+### Frequency phase###
 
-### Frequency power and phase ###
+getFeaturePhase <- function (data){
+  data[is.na(data)] <- 0
+  
+  feature_mag <- adply(.data = data, .margins = 1, .fun = function(x){
+    Arg(fft(x))
+  })
+  
+  # get rid of levels
+  feature_mag<-Filter(is.numeric, feature_mag)
+}
+
+### Frequency phase ###
 
 
+### Plots ###
+feature_length <- getFeatureLength(as.matrix(raw_x))
+feature_length$gestures <- lab_x$gesture
+boxplot(feature_length$V1~feature_length$gesture)
+
+feature_magnitude = getFeatureMagnitude(as.matrix(filtered_raw_x))
+barplot(as.vector(t(feature_magnitude[1,])), ylab = 'Frequency power', xlab = 'Frequency', main = 'Frequency power spectrum')
+
+feature_phase = getFeaturePhase(as.matrix(filtered_raw_x))
+barplot(as.vector(t(feature_phase[1,])), ylab = 'Frequency phase', xlab = 'Frequency', main = 'Frequency phase spectrum')
+
+plotInterpolatedVsRawData <- function(rawData, interpolatedData, index){
+  matplot((data.frame(t(rawData[index,]), t(interpolatedData[index,]))), type='l')
+}
+
+interpolatedData <- interpolateData(as.matrix(raw_x))
+plotInterpolatedVsRawData(raw_x, interpolatedData, 200)
