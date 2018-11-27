@@ -1,57 +1,38 @@
 library(magrittr) #needed for pipes
 library(plyr) #for vectorized commands
 library(dplyr) #needed for filter
+library(scales)
 
 #load data
-x<-read.csv("../data/raw_data_wear_x.csv")
-y<-read.csv("../data/raw_data_wear_y.csv") 
-z<-read.csv("../data/raw_data_wear_z.csv")
+files=c("../data/raw_data_wear_x.csv","../data/raw_data_wear_y.csv","../data/raw_data_wear_z.csv")
+data=lapply(files, read.table, sep=',', fill = T, col.names = c('gesture', 'person', 'record', paste('acc', 1:500, sep='')))
 
-#change names to something useful
-naming<-seq(1:427)
-naming[1:3]<-c("gesture","participant","recording") 
-names(x) <-naming
-names(y) <-naming
-names(z) <-naming
+lab_x<-data[[1]]
+lab_y<-data[[2]]
+lab_z<-data[[3]]
 
-#select gesture (and participant)
-subset_x<-x %>% filter(gesture == 'left') #%>% filter(participant==0)
-subset_y<-z %>% filter(gesture == 'left') #%>% filter(participant==0)
-subset_z<-y %>% filter(gesture == 'left') #%>% filter(participant==0)
-
-#drop NA collumns
-subset_x <- subset_x[,colSums(is.na(subset_x))<nrow(subset_x)] 
-subset_y <- subset_y[,colSums(is.na(subset_y))<nrow(subset_y)]
-subset_z <- subset_z[,colSums(is.na(subset_z))<nrow(subset_z)]
-
-#replace remaining NA with zeros
-subset_x[is.na(subset_x)] <- 0
-subset_y[is.na(subset_y)] <- 0
-subset_z[is.na(subset_z)] <- 0
-
-#calculate new length of rows
-len_x=dim(subset_x)[2]
-len_y=dim(subset_y)[2]
-len_z=dim(subset_z)[2]
-
-#convert dataframe to matrix
-data_x<-data.matrix(subset_x[,4:len_x])
-data_y<-data.matrix(subset_y[,4:len_x])
-data_z<-data.matrix(subset_z[,4:len_x])
-
-#utility function for plotting 
-plot_axis=function(dataset){
-  color<-rgb(0,0,0,alpha=0.3)
-  plot(dataset[1,],type = 'l',col=color,ylim=range(min(dataset),max(dataset)),xlab = "length",ylab = "acceleration")
-  
-  for (i in seq(2:dim(dataset)[1])){
-    lines(data_x[i,],col=color)
-  }
+as_raw=function(data){
+  data[,4:dim(data)[2]]
 }
 
-plot_axis(data_x)
-plot_axis(data_y)
-plot_axis(data_z)
- 
+drop_nas=function(data){
+  data[,colSums(is.na(data))<nrow(data)]
+}
+
+raw_x<-as_raw(lab_x)
+raw_y<-as_raw(lab_y)
+raw_z<-as_raw(lab_z)
+
+#select gesture (and participant)
+gesture_x<-lab_x %>% filter(gesture == 'left') #%>% filter(participant==0)
+gesture_y<-lab_y %>% filter(gesture == 'left') #%>% filter(participant==0)
+gesture_z<-lab_y %>% filter(gesture == 'left') #%>% filter(participant==0)
+
+#drop NA collumns
+dropped_x <- drop_nas(gesture_x) 
+dropped_y <- drop_nas(gesture_y) 
+dropped_z <- drop_nas(gesture_z)  
+
+matplot(t(as_raw(dropped_x)), type='l', col= alpha(colour = 1, 0.03))
 
 
