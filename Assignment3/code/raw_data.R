@@ -11,10 +11,12 @@ lab_x<-data[[1]]
 lab_y<-data[[2]]
 lab_z<-data[[3]]
 
+#takes only numeric things and creates a matrix
 as_raw=function(data){
-  data[,4:dim(data)[2]]
+  as.matrix(data[,4:dim(data)[2]])
 }
 
+#drops the last NAs
 drop_nas=function(data){
   data[,colSums(is.na(data))<nrow(data)]
 }
@@ -23,16 +25,34 @@ raw_x<-as_raw(lab_x)
 raw_y<-as_raw(lab_y)
 raw_z<-as_raw(lab_z)
 
-#select gesture (and participant)
-gesture_x<-lab_x %>% filter(gesture == 'left') #%>% filter(participant==0)
-gesture_y<-lab_y %>% filter(gesture == 'left') #%>% filter(participant==0)
-gesture_z<-lab_y %>% filter(gesture == 'left') #%>% filter(participant==0)
 
-#drop NA collumns
-dropped_x <- drop_nas(gesture_x) 
-dropped_y <- drop_nas(gesture_y) 
-dropped_z <- drop_nas(gesture_z)  
+generate_magnitude<-function(){
+  index<-0
+  lab_m<-adply(raw_x,.margins = 1,.fun = function(row){
+    index<<-index+1
+    sqrt(raw_x[index,]**2+raw_y[index,]**2+raw_z[index,]**2)
+  })
+  lab_m<-lab_m[,-1]
+  
+  lab_m<-cbind(record=lab_x[,3], lab_m)
+  lab_m<-cbind(person=lab_x[,2], lab_m)
+  lab_m<-cbind(gesture=lab_x[,1], lab_m)
+  lab_m
+}
+lab_m<-generate_magnitude()
 
-matplot(t(as_raw(dropped_x)), type='l', col= alpha(colour = 1, 0.03))
+
+#returns specific gestures
+subset_gesture=function(data,gesture,dropNA=FALSE){
+  sub<-data %>% filter(gesture == gesture) #%>% filter(participant==0)
+  if(dropNA){
+    sub<-drop_nas(sub) 
+  }
+  sub
+}
+
+
+test<-subset_gesture(data = lab_m,gesture = "right",dropNA = TRUE) %>% as_raw
+matplot(t(test), type='l', col= alpha(colour = 1, 0.03))
 
 
