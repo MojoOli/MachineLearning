@@ -44,6 +44,10 @@ getFeaturePhase <- function (data){
 
 
 ### Plots ###
+plotInterpolatedVsRawData <- function(rawData, interpolatedData, index){
+  matplot((data.frame(rawData[index,], interpolatedData[index,])), type='l')
+}
+
 feature_length <- getFeatureLength(as.matrix(raw_x))
 feature_length$gestures <- lab_x$gesture
 boxplot(feature_length$V1~feature_length$gesture)
@@ -53,10 +57,6 @@ barplot(as.vector(t(feature_magnitude[1,])), ylab = 'Frequency power', xlab = 'F
 
 feature_phase = getFeaturePhase(raw_x)
 barplot(as.vector(t(feature_phase[1,])), ylab = 'Frequency phase', xlab = 'Frequency', main = 'Frequency phase spectrum')
-
-plotInterpolatedVsRawData <- function(rawData, interpolatedData, index){
-  matplot((data.frame(t(rawData[index,]), t(interpolatedData[index,]))), type='l')
-}
 
 interpolatedData <- interpolateData(raw_x)
 plotInterpolatedVsRawData(raw_x, interpolatedData, 200)
