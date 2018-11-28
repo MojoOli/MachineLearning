@@ -40,6 +40,7 @@ generate_magnitude<-function(){
   lab_m
 }
 lab_m<-generate_magnitude()
+raw_m<-as_raw(lab_m)
 
 
 #returns specific gestures
@@ -53,6 +54,7 @@ subset_gesture=function(data,gesture,dropNA=FALSE){
 
 
 test<-subset_gesture(data = lab_m,gesture = "right",dropNA = TRUE) %>% as_raw
+
 matplot(t(test), type='l', col= alpha(colour = 1, 0.03))
 
 

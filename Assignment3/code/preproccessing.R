@@ -7,7 +7,7 @@ interpolateData <- function(data){
     approx(x = seq(0,1,1/(length(x)-1)), y = x, xout = seq(0,1,stepwidth))$y
   })
   
-  interpolData[501] <- NULL
+  interpolData[-501] 
 }
 
 ### Interpolation ###
