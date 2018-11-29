@@ -60,4 +60,3 @@ barplot(as.vector(t(feature_phase[1,])), ylab = 'Frequency phase', xlab = 'Frequ
 
 interpolatedData <- interpolateData(raw_x)
 plotInterpolatedVsRawData(raw_x, interpolatedData, 200)
-
