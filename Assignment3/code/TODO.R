@@ -10,8 +10,8 @@
 #- lenght of signal
 #END OLI
 #BEGIN ANA
-#+ integral - area under the signal (mean /max/min/median/mad)
-#+ sliding window  (mean /max/min/median/mad)
+#+ integral - area under the signal
+#+ sliding window  (mean/max/min/median/mad)
 #END ANA
 
 #BEGIN ROLI
@@ -35,4 +35,3 @@
 #+ gallery dependent data partitioning
 #+ gallery independent data partitioning (LSOCV)
 #END ANA
-

@@ -1,4 +1,5 @@
 library(signal) # needed for Savitzky-Golay filter
+library(zoo) # for sliding window
 
 ### Remove gravity ###
 
@@ -62,3 +63,46 @@ interpolateData <- function(data){
 }
 
 ### Interpolation ###
+
+### Create dataframe for model training ###
+create_df <- function(data_x, data_y, data_z, func, sw_size){
+  # reduce dimensions
+  mad_x <- slidingWindow(drop_nas(raw_x), func, sw_size)
+  mad_y <- slidingWindow(drop_nas(raw_y), func, sw_size)
+  mad_z <- slidingWindow(drop_nas(raw_z), func, sw_size)
+  
+  # convert list to dataframe
+  mad_x_df <- data.frame(matrix(unlist(mad_x), nrow=nrow(mad_x) , ncol=ncol(mad_x)))
+  mad_y_df <- data.frame(matrix(unlist(mad_y), nrow=nrow(mad_y), ncol=ncol(mad_y)))
+  mad_z_df <- data.frame(matrix(unlist(mad_z), nrow=nrow(mad_z), ncol=ncol(mad_z)))
+  
+  # calculate area under the curve for all axis
+  auc_xyz <- calc_auc(data_x, data_y, data_z)
+  
+  # combine general, x, y, z dataframes.
+  # structure: gesture;id;sampleNr; 85 columns x-value; 85 columns y-value; 85 columns z-value
+  mad_df = data.frame(c(
+    general_data, 
+    auc_xyz,
+    mad_x_df[,2:ncol(mad_x)],
+    mad_y_df[,2:ncol(mad_y)], 
+    mad_z_df[,2:ncol(mad_z)]
+  ))
+  
+  # resert the column names
+  colnames(mad_df) <- c(
+    "gesture",
+    "person_id",
+    "record_nr",
+    "auc_x",
+    "auc_y",
+    "auc_z",
+    paste("x_", 1:(ncol(mad_x_df)-1), sep = ""),
+    paste("y_", 1:(ncol(mad_y_df)-1), sep = ""),
+    paste("z_", 1:(ncol(mad_z_df)-1), sep = "")
+  )
+  
+  return(mad_df)
+}
+
+### Create dataframe for model training ###

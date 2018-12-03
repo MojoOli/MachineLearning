@@ -11,6 +11,9 @@ lab_x<-data[[1]]
 lab_y<-data[[2]]
 lab_z<-data[[3]]
 
+#general data
+general_data <- lab_x[1:3]
+
 #takes only numeric things and creates a matrix
 as_raw=function(data){
   as.matrix(data[,4:dim(data)[2]])
