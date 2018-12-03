@@ -35,3 +35,11 @@
 #+ gallery dependent data partitioning
 #+ gallery independent data partitioning (LSOCV)
 #END ANA
+
+### NOTES
+# Save original length before interpolation
+# Interpolation influences frequency spectrum
+# Think about throwing away features if frequency is above 20Hz
+# Frequency gives speed and therefore could be irrelevant
+# But could after interpolation give information on gesture 
+###
