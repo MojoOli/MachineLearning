@@ -31,24 +31,6 @@ filterWithSGolay <- function(data, n){
   })
 }
 
-# plotting
-filtered_med_x <- filterWithRunMed(raw_x, 5)
-filtered_sg_x <- filterWithSGolay(raw_x, 11)
-
-plot_data_raw <- raw_x[15,]
-plot_data_raw <- plot_data_raw[!is.na(plot_data_raw)]
-
-plot_data_med <- filtered_med_x[15,]
-plot_data_med <- plot_data_med[!is.na(plot_data_med)]
-
-plot_data_sg <- filtered_sg_x[15,]
-plot_data_sg <- plot_data_sg[!is.na(plot_data_sg)]
-
-# filtered_sg_x <- getFeatureMagnitude(filtered_sg_x)
-
-matplot(data.frame(plot_data_raw, plot_data_sg), type='l')
-# matplot(t(filtered_sg_x[1,]), type='l')
-
 ### Filter noise ###
 
 ### Interpolation ###
