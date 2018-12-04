@@ -46,6 +46,18 @@ interpolateData <- function(data){
 
 ### Interpolation ###
 
+### Preprocess ###
+
+preprocess <- function(data){
+  data <- removeGravity(data)
+  data <- filterWithSGolay(data, 15)
+  interpolateData(data)
+}
+
+### Preprocess ###
+
+preprocessedData <- preprocess(raw_x)
+
 ### Create dataframe for model training ###
 create_df <- function(data_x, data_y, data_z, func, sw_size){
   # reduce dimensions

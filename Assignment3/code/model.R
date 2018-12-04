@@ -1,4 +1,30 @@
 library(caret) # for data partition
+
+### preprocess data
+data_x <- preprocess(raw_x)
+data_y <- preprocess(raw_y)
+data_z <- preprocess(raw_z)
+
+### feature extraction
+# length
+length_x <- getFeatureLength(raw_x)
+length_y <- getFeatureLength(raw_y)
+length_z <- getFeatureLength(raw_z)
+# power spectrum
+power_x <- getFeatureMagnitude(data_x)
+power_y <- getFeatureMagnitude(data_y)
+power_z <- getFeatureMagnitude(data_z)
+# phase spectrum
+phase_x <- getFeaturePhase(data_x)
+phase_y <- getFeaturePhase(data_y)
+phase_z <- getFeaturePhase(data_z)
+# AUC
+auc_x <- calc_auc_one_axis(data_x)
+auc_y <- calc_auc_one_axis(data_y)
+auc_z <- calc_auc_one_axis(data_z)
+# Sliding window
+# ToDo
+
 # raw_data partitioning
 # mad
 raw_mad_df <- create_df(raw_x, raw_y, raw_z, mad, 5)
