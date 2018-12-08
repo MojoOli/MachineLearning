@@ -11,6 +11,20 @@ removeGravity <- function(data){
 
 ### Remove gravity ###
 
+### Magnitude ###
+
+generateMagnitude <- function(data_x, data_y, data_z){
+  index <- 0
+  lab_m <- adply(data_x, .margins = 1, .fun = function(row){
+    index <<- index+1
+    sqrt(data_x[index,]**2 + data_y[index,] ** 2 + data_z[index,] ** 2)
+  })
+  lab_m <- lab_m[,-1]
+  lab_m
+}
+
+### Magnitude ###
+
 ### Filter noise ###
 
 filterWithRunMed <- function(data, k, endrule = "median"){
@@ -23,7 +37,9 @@ filterWithRunMed <- function(data, k, endrule = "median"){
 }
 
 filterWithSGolay <- function(data, n){
+  print(n)
   aaply(data, .margins = 1, .fun = function(x){
+    print(x)
     na_data <- x[!is.na(x)]
     matrixData <- matrix(, nrow = 1, ncol = length(x))
     matrixData[1:length(na_data)] <- sgolayfilt(as.vector(na_data), n = n)
@@ -48,10 +64,14 @@ interpolateData <- function(data){
 
 ### Preprocess ###
 
-preprocess <- function(data){
-  data <- removeGravity(data)
-  data <- filterWithSGolay(data, 15)
-  interpolateData(data)
+preprocess <- function(data_x, data_y, data_z){
+  data_x <- removeGravity(raw_x)
+  data_y <- removeGravity(raw_y)
+  data_z <- removeGravity(raw_z)
+  data_mag <- generateMagnitude(data_x, data_y, data_z)
+  str(data_mag)
+  data_mag <- filterWithSGolay(data_mag, 15)
+  interpolateData(data_mag)
 }
 
 ### Preprocess ###
