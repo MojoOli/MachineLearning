@@ -1,10 +1,8 @@
 
 
 ### preprocess data
-data_x <- preprocess(raw_x)
-data_y <- preprocess(raw_y)
-data_z <- preprocess(raw_z)
-data_m <- preprocess(raw_m)
+data <- preprocess(raw_x,raw_y,raw_z)
+
 
 ### feature extraction
 # length
@@ -12,19 +10,14 @@ length_x <- getFeatureLength(raw_x)
 length_y <- getFeatureLength(raw_y)
 length_z <- getFeatureLength(raw_z)
 # power spectrum
-power_x <- getFeatureMagnitude(data_x)
-power_y <- getFeatureMagnitude(data_y)
-power_z <- getFeatureMagnitude(data_z)
-# phase spectrum
-phase_x <- getFeaturePhase(data_x)
-phase_y <- getFeaturePhase(data_y)
-phase_z <- getFeaturePhase(data_z)
-# AUC
-auc_x <- calc_auc_one_axis(data_x)
-auc_y <- calc_auc_one_axis(data_y)
-auc_z <- calc_auc_one_axis(data_z)
+power <- getFeatureMagnitude(data)
 
-df<-data.frame(length_x,length_y,length_z,power_x,power_y,power_z,phase_x,phase_y,phase_z,auc_x,auc_y,auc_z)
+# phase spectrum
+phase <- getFeaturePhase(data)
+# AUC
+auc <- calc_auc(data)
+
+df<-data.frame(length_x,length_y,length_z,auc,power,phase)
 
 
 # raw_data partitioning
@@ -171,7 +164,7 @@ trControl <- trainControl(method = 'repeatedcv',
 names(getModelInfo('lda')) # linear discriminant analysis
 getModelInfo('lda')[[1]]$parameters # this model does not have any hyperparameters
 models$modelLda <- train(x = df, # exclude the person id 
-                         y = raw[,1],
+                         y = general_data[,1],
                          preProcess = c('center', 'scale', 'pca'), 
                          method = 'lda', 
                          tuneGrid = NULL, 
