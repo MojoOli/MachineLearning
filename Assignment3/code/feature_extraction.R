@@ -10,22 +10,17 @@ getFeatureLength <- function (data){
   feature_length<-Filter(is.numeric, feature_length)
 }
 
-### Sample Length ###
 
 ### Frequency power###
 
 getFeatureMagnitude <- function (data){
   data[is.na(data)] <- 0
   
-  feature_mag <- adply(.data = data, .margins = 1, .fun = function(x){
+  feature_mag <- aaply(.data = data, .margins = 1, .fun = function(x){
     Mod(fft(x))
   })
-  
-  # get rid of levels
-  feature_mag<-Filter(is.numeric, feature_mag)
 }
 
-### Frequency power ###
 
 ### Frequency phase###
 
@@ -40,7 +35,30 @@ getFeaturePhase <- function (data){
   feature_mag<-Filter(is.numeric, feature_mag)
 }
 
-### Frequency phase ###
+
+### Spectral Centroid ###
+
+getSpectralCentroid <- function(data){
+  feature_sc <- adply(.data = data, .margins = 1, .fun = function(x){
+    data_na <- x[!is.na(x)]
+    mean(data_na)
+  })
+  
+  # get rid of levels
+  feature_sc<-Filter(is.numeric, feature_sc)
+}
+
+### Band energy ###
+
+getBandEnergy <- function(data, width){
+  feature_band <- adply(.data = data, .margins = 1, .fun = function(x){
+    x[1:width]
+  })
+  
+  # get rid of levels
+  feature_band<-Filter(is.numeric, feature_band)
+}
+
 
 ### Sliding window ###
 
@@ -50,18 +68,19 @@ slidingWindow <- function(data, func, w_size){
   sw_data <- adply(.data = data, .margins = 1, .fun = function(x){
     axis_data <- as.double(rollapply(data = x, width = w_size, by = w_size, partial = T, FUN = func))
   })
+  sw_data<-Filter(is.numeric, sw_data)
+  droplevels(sw_data)
 }
 
 ### Sliding window ###
 
 
-
-
 ### AUC ###
 calc_auc <- function(data) {
-  aaply(.data = data, .margins = 1, .fun = function(row) {
+  feature_auc <- adply(.data = data, .margins = 1, .fun = function(row) {
     flux::auc(x = 0:length(row), y = row)
   })
+  # get rid of levels
+  feature_auc<-Filter(is.numeric, feature_auc)
 }
 
-### AUC ###
