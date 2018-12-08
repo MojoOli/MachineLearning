@@ -56,9 +56,6 @@ slidingWindow <- function(data, func, w_size){
 
 
 ### AUC ###
-# install.package("flux")
-library("flux")
-
 # function call auc specified with package name because another function also have function with the same name
 calc_auc <- function(data_x, data_y, data_z){
   

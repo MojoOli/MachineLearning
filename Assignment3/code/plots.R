@@ -4,11 +4,6 @@
 # + model parameter boxplots
 # + interpolated vs normal signal plot ✓
 ###
-
-library(corrplot)
-library(plyr)
-library(caret) # caret ML framework
-library(doMC) # parallelization
 registerDoMC(4) # register 3 cores (more cores require more RAM)
 
 #### Plots from other scripts

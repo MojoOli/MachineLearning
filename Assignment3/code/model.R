@@ -1,9 +1,10 @@
-library(caret) # for data partition
+
 
 ### preprocess data
 data_x <- preprocess(raw_x)
 data_y <- preprocess(raw_y)
 data_z <- preprocess(raw_z)
+data_m <- preprocess(raw_m)
 
 ### feature extraction
 # length
@@ -22,8 +23,9 @@ phase_z <- getFeaturePhase(data_z)
 auc_x <- calc_auc_one_axis(data_x)
 auc_y <- calc_auc_one_axis(data_y)
 auc_z <- calc_auc_one_axis(data_z)
-# Sliding window
-# ToDo
+
+df<-data.frame(length_x,length_y,length_z,power_x,power_y,power_z,phase_x,phase_y,phase_z,auc_x,auc_y,auc_z)
+
 
 # raw_data partitioning
 # mad
@@ -152,5 +154,31 @@ pi_mag_min_test <- subset(mag_min_df, person_id==0)
 pi_mag_median_train <- subset(mag_median_df, person_id!=0)
 pi_mag_median_test <- subset(mag_median_df, person_id==0)
 
+#population independent (raw/feature) vs population dependent (raw/feature)
+#models: (svm,lda,lda2,knn,rf)
+models <- list()
+registerDoMC(12) # register 3 cores (more cores require more RAM)
+
+trControl <- trainControl(method = 'repeatedcv', 
+                          number = 5, 
+                          repeats = 10, 
+                          returnData = F, 
+                          classProbs = T, 
+                          returnResamp = 'final', 
+                          allowParallel = T)
 
 
+names(getModelInfo('lda')) # linear discriminant analysis
+getModelInfo('lda')[[1]]$parameters # this model does not have any hyperparameters
+models$modelLda <- train(x = df, # exclude the person id 
+                         y = raw[,1],
+                         preProcess = c('center', 'scale', 'pca'), 
+                         method = 'lda', 
+                         tuneGrid = NULL, 
+                         metric = 'Kappa', 
+                         trControl = trControl)
+models$modelLda
+cvConfMatrix <- confusionMatrix(models$modelLda)
+cvConfMatrix
+levelplot(sweep(x = cvConfMatrix$table, STATS = colSums(cvConfMatrix$table), MARGIN = 2, FUN = '/'), col.regions=gray(100:0/100))
+#saveRDS(models$modelLda, file='modelRawDataLda.rds')

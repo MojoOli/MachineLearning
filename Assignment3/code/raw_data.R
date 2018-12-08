@@ -1,8 +1,3 @@
-library(magrittr) #needed for pipes
-library(plyr) #for vectorized commands
-library(dplyr) #needed for filter
-library(scales)
-
 #load data
 files=c("../data/raw_data_wear_x.csv","../data/raw_data_wear_y.csv","../data/raw_data_wear_z.csv")
 data=lapply(files, read.table, sep=',', fill = T, col.names = c('gesture', 'person', 'record', paste('acc', 1:500, sep='')))

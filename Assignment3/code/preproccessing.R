@@ -1,5 +1,4 @@
-library(signal) # needed for Savitzky-Golay filter
-library(zoo) # for sliding window
+
 
 ### Remove gravity ###
 
@@ -60,6 +59,7 @@ preprocessedData <- preprocess(raw_x)
 
 ### Create dataframe for model training ###
 create_df <- function(data_x, data_y, data_z, func, sw_size){
+  
   # reduce dimensions
   mad_x <- slidingWindow(drop_nas(raw_x), func, sw_size)
   mad_y <- slidingWindow(drop_nas(raw_y), func, sw_size)
@@ -91,6 +91,35 @@ create_df <- function(data_x, data_y, data_z, func, sw_size){
     "auc_x",
     "auc_y",
     "auc_z",
+    paste("x_", 1:(ncol(mad_x_df)-1), sep = ""),
+    paste("y_", 1:(ncol(mad_y_df)-1), sep = ""),
+    paste("z_", 1:(ncol(mad_z_df)-1), sep = "")
+  )
+  
+  return(mad_df)
+}
+
+concat_df <- function(data_x, data_y, data_z){
+  
+  # convert list to dataframe
+  mad_x_df <- data.frame(matrix(unlist(data_x), nrow=nrow(data_x) , ncol=ncol(data_x)))
+  mad_y_df <- data.frame(matrix(unlist(data_y), nrow=nrow(data_y), ncol=ncol(data_y)))
+  mad_z_df <- data.frame(matrix(unlist(data_z), nrow=nrow(data_z), ncol=ncol(data_z)))
+  
+  # combine general, x, y, z dataframes.
+  # structure: gesture;id;sampleNr; 85 columns x-value; 85 columns y-value; 85 columns z-value
+  mad_df = data.frame(c(
+    general_data, 
+    mad_x_df[,2:ncol(data_x)],
+    mad_y_df[,2:ncol(data_y)], 
+    mad_z_df[,2:ncol(data_z)]
+  ))
+  
+  # resert the column names
+  colnames(mad_df) <- c(
+    "gesture",
+    "person_id",
+    "record_nr",
     paste("x_", 1:(ncol(mad_x_df)-1), sep = ""),
     paste("y_", 1:(ncol(mad_y_df)-1), sep = ""),
     paste("z_", 1:(ncol(mad_z_df)-1), sep = "")
