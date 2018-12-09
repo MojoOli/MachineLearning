@@ -18,23 +18,28 @@ phase <- getFeaturePhase(generateMagnitude(raw_x, raw_y, raw_z))
 sc <- getSpectralCentroid(power)
 
 # spectrum band energy
-band_energy <- getBandEnergy(power, 20)
+band_energy <- getBandEnergy(power, 40)
 
 
 #sliding window
-sw_mad <- slidingWindow(data, mad, 20)
-sw_IQR <- slidingWindow(data, IQR, 20)
-sw_median <- slidingWindow(data, median, 20)
-sw_max <-slidingWindow(data,max,20)
-sw_min <-slidingWindow(data,min,20)
+window_size<-20
+sw_mad <- slidingWindow(data, mad, window_size)
+sw_IQR <- slidingWindow(data, IQR, window_size)
+sw_median <- slidingWindow(data, median, window_size)
+sw_max <-slidingWindow(data,max,window_size)
+sw_min <-slidingWindow(data,min,window_size)
 
 
-df<-data.frame(length_x,sw_mad,sw_IQR,sw_median,sw_max,sw_min,sc,band_energy)
+#df<-data.frame(length_x,sw_mad,sw_IQR,sw_median,sw_max,sw_min,sc,band_energy)
+df<-data.frame(data)
+
+foundCorIndexes <- findCorrelation(cor(df),cutoff = 0.9)
+df<- df[,-foundCorIndexes]
 
 
 #models: (svm-linear,lda,knn,rf)
 models <- list()
-registerDoMC(10) # register 3 cores (more cores require more RAM)
+registerDoMC(12) # register 3 cores (more cores require more RAM)
 
 trControl <- trainControl(method = 'repeatedcv', 
                           number = 10, 
@@ -50,7 +55,7 @@ names(getModelInfo('lda')) # linear discriminant analysis
 getModelInfo('lda')[[1]]$parameters # this model does not have any hyperparameters
 models$lda <- train(x = df, # exclude the person id 
                          y = general_data[,1],
-                         preProcess = c('center', 'scale', 'pca'), 
+                         preProcess = c('center', 'scale'), 
                          method = 'lda', 
                          tuneGrid = NULL, 
                          metric = 'Kappa', 
@@ -67,9 +72,9 @@ names(getModelInfo('knn'))
 getModelInfo('knn')[[2]]$parameters  #  k numeric #Neighbors
 models$knn <- train(x = df, # exclude the person id 
                                 y = general_data[,1],
-                                preProcess = c('center', 'scale', 'pca'),  
+                                preProcess = c('center', 'scale'),  
                                 method = 'knn',
-                                tuneGrid = expand.grid(k=1:50), 
+                                tuneGrid = expand.grid(k=1:30), 
                                 metric = 'Kappa', 
                                 trControl = trControl)
 models$knn
@@ -85,9 +90,9 @@ names(getModelInfo('rf')) # random forest
 getModelInfo('rf')[[2]]$parameters #mtry numeric #Randomly Selected Predictors
 models$rf <- train( x = df, 
                                           y = general_data[,1], 
-                                          preProcess = c('center', 'scale', 'pca'),   
+                                          preProcess = c('center', 'scale'),   
                                           method = 'rf',
-                                          tuneGrid = expand.grid(mtry=1:20),
+                                          tuneGrid = expand.grid(mtry=1:10),
                                           metric = 'Kappa', 
                                           trControl = trControl)
 models$rf
@@ -106,12 +111,13 @@ names(getModelInfo('svmLinear')) # linear discriminant analysis
 getModelInfo('svmLinear')[[1]]$parameters # tau numeric Regularization Parameter
 models$svm <- train(x = df, # exclude the person id 
                          y = general_data[,1],
-                         preProcess = c('center', 'scale', 'pca'), 
+                         preProcess = c('center', 'scale'), 
                          method = 'svmLinear', 
-                         tuneGrid = expand.grid(C=3**(-3:3)), 
+                         tuneGrid = expand.grid(C=3**(-2:2)), 
                          metric = 'Kappa', 
                          trControl = trControl)
 models$svm
+plot(models$svm)
 cvConfMatrix <- confusionMatrix(models$svm)
 cvConfMatrix
 levelplot(sweep(x = cvConfMatrix$table, STATS = colSums(cvConfMatrix$table), MARGIN = 2, FUN = '/'), col.regions=gray(100:0/100))
